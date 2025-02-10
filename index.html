@@ -111,7 +111,6 @@
 
       saveDataToGoogleSheet(dni, activity, startTimeFormatted, endTimeFormatted);
       resetTimer();
-      alert("Datos guardados correctamente.");
     }
 
     function updateTimerDisplay() {
@@ -128,8 +127,8 @@
     }
 
     function saveDataToGoogleSheet(dni, activity, startTime, endTime) {
-      const sheetUrl = "https://script.google.com/macros/s/AKfycbzfbR7UFI44-W5zjAaFsThnj6JJ2Wg8WgCaQQU9Fu1oL3f8Hl8qKObKKhgoZEkbE32R/exec";
-      const data = { Codigo: dni, Actividad: activity, "Hora Inicio": startTime, "Hora Fin": endTime };
+      const sheetUrl = "https://script.google.com/macros/s/AKfycbxDVeMPLEo2ZDoz4w_gvFNG4yNhhLI4vGn6Pv29om-MIF0tLy4PmzYmZH_ejSB9otekiw/exec";
+      const data = { Codigo: dni, Actividad: activity, HoraInicio: startTime, HoraFin: endTime };
       fetch(sheetUrl, {
         method: 'POST',
         headers: {
@@ -138,8 +137,14 @@
         body: JSON.stringify(data)
       })
       .then(response => response.json())
-      .then(result => console.log("Datos enviados:", result))
-      .catch(error => console.error("Error al guardar datos:", error));
+      .then(result => {
+        console.log("Datos enviados:", result);
+        alert("Datos guardados correctamente.");
+      })
+      .catch(error => {
+        console.error("Error al guardar datos:", error);
+        alert("Error al enviar los datos. Por favor, intente de nuevo.");
+      });
     }
   </script>
 </body>
