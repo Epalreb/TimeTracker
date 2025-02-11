@@ -1,201 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Actividades</title>
+  <title>Registro de Actividad</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 2em auto;
-      padding: 1em;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    * {
+      box-sizing: border-box;
     }
-
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 10px;
+      background-color: #f9f9f9;
+      max-width: 500px;
+      margin: 0 auto;
+    }
     h1 {
       text-align: center;
+      font-size: 1.5rem;
+      color: #007bff;
     }
-
     label {
       display: block;
-      margin-top: 1em;
-      font-weight: bold;
+      font-size: 1rem;
+      margin: 10px 0 5px;
     }
-
-    input, textarea, select {
+    input, select, textarea, button {
       width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
     }
-
     button {
-      display: block;
-      width: 48%;
-      padding: 0.7em;
-      background-color: #0078d4;
+      background-color: #007bff;
       color: white;
-      border: none;
-      border-radius: 4px;
       cursor: pointer;
-      margin-top: 1.5em;
+      border: none;
     }
-
     button:hover {
-      background-color: #005ea8;
+      background-color: #0056b3;
     }
-
-    #activity-section {
-      display: none;
+    button:disabled {
+      background-color: #cccccc;
     }
-
-    #timer {
-      font-size: 1.5em;
-      color: #0078d4;
-      text-align: center;
-      margin-top: 1em;
+    .timer {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #333;
     }
-
-    #response-message {
-      margin-top: 1em;
-      font-weight: bold;
-    }
-
-    .button-container {
+    .container {
       display: flex;
-      justify-content: space-between;
-    }
-
-    .centered-button {
-      display: flex;
-      justify-content: center;
-      margin-top: 1.5em;
+      flex-direction: column;
+      gap: 15px;
     }
   </style>
 </head>
 <body>
-  <h1>Registro de Actividades</h1>
+  <h1>Registro de Actividad</h1>
 
-  <div id="identification-section">
-    <label for="codigo">Ingrese su Código:</label>
-    <input type="text" id="codigo" placeholder="Código de identificación" required>
-    <div class="centered-button">
-      <button type="button" onclick="goToActivitySection()">Ingresar</button>
-    </div>
-  </div>
+  <div class="container">
+    <label for="dni">DNI</label>
+    <input type="text" id="dni" placeholder="Ingrese su DNI">
 
-  <div id="activity-section">
-    <h2>Registro de Actividad</h2>
-    <p><strong>Código:</strong> <span id="codigoDisplay"></span></p>
-
-    <label for="actividad">Tipo de Actividad:</label>
-    <select id="actividad">
-      <option value="Producción">Producción</option>
-      <option value="Mantenimiento">Mantenimiento</option>
-      <option value="Administración">Administración</option>
+    <label for="activity">Actividad</label>
+    <select id="activity">
+      <option value="">Seleccione una opción</option>
+      <option value="Reponer">Reponer</option>
+      <option value="Cargar WMS">Cargar WMS</option>
+      <option value="Ordenar">Ordenar</option>
     </select>
 
-    <label for="comentario">Comentario:</label>
-    <textarea id="comentario" rows="3" placeholder="Comentario adicional"></textarea>
+    <label for="comments">Comentarios</label>
+    <textarea id="comments" rows="3" placeholder="Ingrese sus comentarios"></textarea>
 
-    <div id="timer">00:00:00</div>
-
-    <div class="button-container">
-      <button type="button" onclick="setStartTime()">Inicio</button>
-      <button type="button" onclick="setEndTime()">Fin</button>
-    </div>
+    <button id="startButton" onclick="startTimer()">Inicio</button>
+    <div id="timerDisplay" class="timer"></div>
+    <button id="endButton" onclick="sendDataToGoogleSheet()" style="display: none;">Fin</button>
   </div>
 
-  <div id="response-message"></div>
-
   <script>
-    let horaInicio = '';
-    let horaFin = '';
-    let timerInterval;
-    let elapsedTime = 0;
-
-    function goToActivitySection() {
-      const codigo = document.getElementById('codigo').value;
-      if (codigo) {
-        document.getElementById('codigoDisplay').textContent = codigo;
-        document.getElementById('identification-section').style.display = 'none';
-        document.getElementById('activity-section').style.display = 'block';
-      } else {
-        alert('Por favor, ingrese su código.');
-      }
-    }
-
-    function setStartTime() {
-      horaInicio = new Date().toLocaleTimeString();
-      startTimer();
-    }
-
-    function setEndTime() {
-      horaFin = new Date().toLocaleTimeString();
-      clearInterval(timerInterval);
-      saveData();
-      resetTimer(); // Reiniciar el cronómetro
-    }
-
-    function resetTimer() {
-      elapsedTime = 0;
-      updateTimerDisplay(); // Mostrar "00:00:00" en el cronómetro
-    }
+    let startTime;
 
     function startTimer() {
-      elapsedTime = 0;
-      updateTimerDisplay();
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        elapsedTime++;
-        updateTimerDisplay();
-      }, 1000);
+      startTime = new Date();
+      document.getElementById('timerDisplay').textContent = `Hora de inicio: ${startTime.toLocaleTimeString()}`;
+      document.getElementById('startButton').style.display = 'none';
+      document.getElementById('endButton').style.display = 'block';
     }
 
-    function updateTimerDisplay() {
-      const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, '0');
-      const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, '0');
-      const seconds = String(elapsedTime % 60).padStart(2, '0');
-      document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
-    }
+    async function sendDataToGoogleSheet() {
+      const dni = document.getElementById('dni').value;
+      const activity = document.getElementById('activity').value;
+      const comments = document.getElementById('comments').value;
+      const endTime = new Date();
 
-    async function saveData() {
-      const codigo = document.getElementById('codigoDisplay').textContent;
-      const actividad = document.getElementById('actividad').value;
-      const comentario = document.getElementById('comentario').value;
+      if (!dni || !activity) {
+        alert('Por favor complete el DNI y la actividad.');
+        return;
+      }
 
       const data = {
-        Codigo: codigo,
-        Actividad: actividad,
-        HoraInicio: horaInicio,
-        HoraFin: horaFin,
-        Comentario: comentario
+        DNI: dni,
+        Actividad: activity,
+        Comentarios: comments,
+        HoraInicio: startTime.toLocaleTimeString(),
+        HoraFin: endTime.toLocaleTimeString()
       };
 
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwrLdaVSukEETUE_XioJi_j1kEdBNUfkHrtEeBb2Ke-fEcke0jTKGxlbeFo_zKkCemi/exec", {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbwyMNROPGWpVDcRaSvYfWdRtm1omKB9d5UDwk7WHAgr6VFSg-4mQ-EpGalMPpyCQ897zg/exec', {
           method: 'POST',
-          mode: 'cors',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-        if (result.result === 'success') {
-          document.getElementById('response-message').textContent = 'Información enviada con éxito.';
+        if (response.ok) {
+          alert('Datos enviados a Google Sheets.');
+          resetForm();
         } else {
-          document.getElementById('response-message').textContent = 'Error al guardar datos.';
+          alert('Error al enviar datos.');
         }
       } catch (error) {
-        document.getElementById('response-message').textContent = 'Error al guardar datos: ' + error;
-        console.error('Error al guardar datos:', error);
+        console.error('Error:', error);
+        alert('Error en la conexión.');
       }
+    }
+
+    function resetForm() {
+      document.getElementById('dni').value = '';
+      document.getElementById('activity').value = '';
+      document.getElementById('comments').value = '';
+      document.getElementById('startButton').style.display = 'block';
+      document.getElementById('endButton').style.display = 'none';
+      document.getElementById('timerDisplay').textContent = '';
     }
   </script>
 </body>
