@@ -61,8 +61,8 @@
   <h1>Registro de Actividad</h1>
 
   <div class="container">
-    <label for="dni">DNI</label>
-    <input type="text" id="dni" placeholder="Ingrese su DNI">
+    <label for="dni">Código</label>
+    <input type="text" id="dni" placeholder="Ingrese su código">
 
     <label for="activity">Actividad</label>
     <select id="activity">
@@ -72,7 +72,7 @@
       <option value="Ordenar">Ordenar</option>
     </select>
 
-    <label for="comments">Comentarios</label>
+    <label for="comments">Comentario</label>
     <textarea id="comments" rows="3" placeholder="Ingrese sus comentarios"></textarea>
 
     <button id="startButton" onclick="startTimer()">Inicio</button>
@@ -97,21 +97,20 @@
       const endTime = new Date();
 
       if (!dni || !activity) {
-        alert('Por favor complete el DNI y la actividad.');
+        alert('Por favor complete el Código y la Actividad.');
         return;
       }
 
       const params = new URLSearchParams({
-        dniRuc: dni,
-        nombreLocal: activity,
-        nombreRazonSocial: comments,
-        fecha: new Date().toLocaleDateString(),
-        hora: `${startTime.toLocaleTimeString()} - ${endTime.toLocaleTimeString()}`,
-        mainGroup: 'Registro'
+        Codigo: dni,  
+        Actividad: activity,
+        Comentario: comments,
+        HoraInicio: startTime.toLocaleTimeString(),
+        Fecha: new Date().toLocaleDateString()
       });
 
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbwyMNROPGWpVDcRaSvYfWdRtm1omKB9d5UDwk7WHAgr6VFSg-4mQ-EpGalMPpyCQ897zg/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxAq8b9mg6c2k8DZExT-Rjol0iZzuxggqjCHRff-H4Je6wMKazpPTsEhm5V5v71cfl-/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
