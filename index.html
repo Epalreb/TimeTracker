@@ -82,10 +82,19 @@
 
   <script>
     let startTime;
+    let interval;
 
     function startTimer() {
       startTime = new Date();
       document.getElementById('timerDisplay').textContent = `Hora de inicio: ${startTime.toLocaleTimeString()}`;
+
+      // Iniciar cronómetro en tiempo real
+      interval = setInterval(() => {
+        let now = new Date();
+        let elapsedTime = Math.floor((now - startTime) / 1000); // Segundos transcurridos
+        document.getElementById('timerDisplay').textContent = `Hora de inicio: ${startTime.toLocaleTimeString()} | Tiempo: ${elapsedTime} seg`;
+      }, 1000);
+
       document.getElementById('startButton').style.display = 'none';
       document.getElementById('endButton').style.display = 'block';
     }
@@ -101,16 +110,20 @@
         return;
       }
 
+      // Detener el cronómetro
+      clearInterval(interval);
+
       const params = new URLSearchParams({
         Codigo: dni,  
         Actividad: activity,
         Comentario: comments,
         HoraInicio: startTime.toLocaleTimeString(),
+        HoraFin: endTime.toLocaleTimeString(),
         Fecha: new Date().toLocaleDateString()
       });
 
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxAq8b9mg6c2k8DZExT-Rjol0iZzuxggqjCHRff-H4Je6wMKazpPTsEhm5V5v71cfl-/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxMe6jASLExUFkNuh8PiJ-pi0wbAvZTbRPnB3QLifJdJcft3RK80yxrPaGe2slq8Qfz/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
