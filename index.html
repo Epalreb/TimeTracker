@@ -114,8 +114,8 @@
         const comments = document.getElementById('comments').value;
         const endTime = new Date();
  
-        if (!dni || !activity || !cantidad) {
-          alert('Por favor complete el Código, la Actividad y la Cantidad de productos.');
+        if (!dni || !cantidad) {
+          alert('Por favor complete el Código, la Actividad.');
           return;
         }
  
@@ -139,7 +139,7 @@
             body: JSON.stringify(datos)
           });
  
-          alert('Datos enviados a Google Sheets.');
+          
           resetForm();
         } catch (error) {
           console.error('Error:', error);
